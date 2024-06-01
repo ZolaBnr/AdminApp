@@ -9,7 +9,6 @@ import '../../../../utils/popups/loaders.dart';
 import '../../../personalisation/models/user_model.dart';
 import '../../screens/signup/verify_email.dart';
 
-
 class SignupController extends GetxController {
   static SignupController get instance => Get.find();
 
@@ -21,37 +20,39 @@ class SignupController extends GetxController {
   final username = TextEditingController(); // Controller for username input
   final password = TextEditingController(); // Controller for password input
   final firstName = TextEditingController(); // Controller for first name input
-  final phoneNumber = TextEditingController(); // Controller for phone number input
-  final GlobalKey<FormState> signupFormKey = GlobalKey<FormState>(); // Form key for form validation
+  final phoneNumber =
+      TextEditingController(); // Controller for phone number input
+  final GlobalKey<FormState> signupFormKey =
+      GlobalKey<FormState>(); // Form key for form validation
 
   /// --SIGNUP
   void signup() async {
     try {
       // Start Loading
-      TFullScreenLoader.openLoadingDialog('we are processing your information ...', Images() as String); //Images.openLoadingDialog
+      TFullScreenLoader.openLoadingDialog(
+          'we are processing your information ...', Images.docerAnimation);
 
       // Check Internet Connectivity
       final isConnected = await NetworkManager.instance.isConnected();
-      if (!isConnected) {
-        return;
-      }
+      if (!isConnected) return;
 
       // Form Validation
-      if (!signupFormKey.currentState!.validate()) {
-        return;
-      }
+      if (!signupFormKey.currentState!.validate()) return;
 
       // Privacy Policy Check
       if (!privacyPolicy.value) {
         TLoaders.warningSnackBar(
           title: 'Accept Privacy Policy ',
-          message: 'In order to create account, you must have to read and accept the Privacy Policy & Terms Of Use ',
+          message:
+              'In order to create account, you must have to read and accept the Privacy Policy & Terms Of Use ',
         );
         return;
       }
 
       // Register user in the Firebase Authentication & Save user data in the Firebase
-      final userCredential = await AuthenticationRepository.instance.registerWithEmailAndPassword(email.text.trim(), password.text.trim());
+      final userCredential = await AuthenticationRepository.instance
+          .registerWithEmailAndPassword(
+              email.text.trim(), password.text.trim());
 
       // Save Authenticated user data in the Firebase Firestore
       final newUser = UserModel(
@@ -70,13 +71,15 @@ class SignupController extends GetxController {
       TFullScreenLoader.stopLoading();
 
       // Show Success Message
-      TLoaders.successSnackBar(title: 'Congratulation', message: 'Your account has been created. Verify email to continue.');
+      TLoaders.successSnackBar(
+          title: 'Congratulation',
+          message: 'Your account has been created. Verify email to continue.');
 
       // Move to Verify Email Screen
-      Get.to(() =>  VerifyEmailScreen(email: email.text.trim()));
+      Get.to(() => VerifyEmailScreen());
     } catch (e) {
       //show some Geeneric Error to the user
-      TLoaders.errorSnackBar(title: 'on snap ', message: e.toString());
+      TLoaders.errorSnackBar(title: 'on Snap! ', message: e.toString());
     } finally {
       // Remove Loader
       TFullScreenLoader.stopLoading();
