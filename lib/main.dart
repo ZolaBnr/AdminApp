@@ -11,40 +11,29 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'app.dart';
 import 'common/data/repositories/authentification/authentification_repository.dart';
-import 'features/repair/push_notifcations/firebase_config.dart';
-import 'features/repair/push_notifcations/notification_details.dart';
-import 'features/repair/push_notifcations/notification_list.dart';
+import 'features/repair/push_notification/notification_details.dart';
+import 'features/repair/push_notification/notification_list.dart';
 import 'firebase_options.dart';
+
 late Size mq;
-/// Define a top-level named handler which background/terminated messages will
-/// call.
-///
-/// To verify things are working, check out the native platform logs.
+
+/// Define a top-level named handler which background/terminated messages will call.
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  // If you're going to use other Firebase services in the background, such as Firestore,
-  // make sure you call `initializeApp` before using other Firebase services.
-  await Firebase.initializeApp(options: DefaultFirebaseConfig.platformOptions);
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   print('Handling a background message ${message.messageId}');
 }
 
-/// Create a [AndroidNotificationChannel] for heads up notifications
+/// Create an [AndroidNotificationChannel] for heads-up notifications
 late AndroidNotificationChannel channel;
 
 /// Initialize the [FlutterLocalNotificationsPlugin] package.
 late FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
 
-
 Future<void> main() async {
-
   WidgetsFlutterBinding.ensureInitialized();
+
   await Firebase.initializeApp(
-    /// ToDO change your data ///
-    options: const FirebaseOptions(
-      apiKey: 'AIzaSyAhemZXQev7UNHQaS42zI-2pgrZSWuA',
-      appId: '1:1044214255532:android:3b5fd2ca0c51e701353409',
-      messagingSenderId: '1044214255532',
-      projectId: 'push-notification-224bc',
-    ),
+    options: DefaultFirebaseOptions.currentPlatform,
   );
 
   // Set the background messaging handler early on, as a named top-level function
@@ -54,51 +43,33 @@ Future<void> main() async {
     channel = const AndroidNotificationChannel(
       'high_importance_channel', // id
       'High Importance Notifications', // title
-      // 'This channel is used for important notifications.', // description
       importance: Importance.high,
     );
 
     flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
-    /// Create an Android Notification Channel.
-    ///
-    /// We use this channel in the `AndroidManifest.xml` file to override the
-    /// default FCM channel to enable heads up notifications.
     await flutterLocalNotificationsPlugin
-        .resolvePlatformSpecificImplementation<
-        AndroidFlutterLocalNotificationsPlugin>()
+        .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
         ?.createNotificationChannel(channel);
 
-    /// Update the iOS foreground notification presentation options to allow
-    /// heads up notifications.
-    await FirebaseMessaging.instance
-        .setForegroundNotificationPresentationOptions(
+    await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
       alert: true,
       badge: true,
       sound: true,
     );
   }
-  /// Widgets Binding
-  final WidgetsBinding widgetsBinding = WidgetsFlutterBinding
-      .ensureInitialized();
 
-  /// GetX Local Storage
+  // GetX Local Storage
   await GetStorage.init();
 
-  /// Await Splash until other items Load
-  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+  // Await Splash until other items Load
+  FlutterNativeSplash.preserve(widgetsBinding: WidgetsFlutterBinding.ensureInitialized());
 
-  /// Initialize Firebase & Authentication Repository
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform,)
-      .then(
-          (FirebaseApp value) => Get.put(AuthenticationRepository())//first instance
-  );
-
-  // Load all the Material Design / Themes / Localizations / Bindings
+  // Initialize Authentication Repository
+  Get.put(AuthenticationRepository());
 
   runApp(const App());
 }
-
 
 /// Entry point for the example application.
 class MessagingExampleApp extends StatelessWidget {
@@ -111,7 +82,7 @@ class MessagingExampleApp extends StatelessWidget {
       title: 'Messaging Example App',
       theme: ThemeData.light(),
       routes: {
-        '/': (context) =>const Application(),
+        '/': (context) => const Application(),
         '/message': (context) => const MessageView(),
       },
     );
@@ -123,15 +94,15 @@ class Application extends StatefulWidget {
   const Application({Key? key}) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => _Application();
+  State<StatefulWidget> createState() => _ApplicationState();
 }
 
-class _Application extends State<Application> {
+class _ApplicationState extends State<Application> {
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
 
   void getToken() async {
-    final token =
-    _firebaseMessaging.getToken().then((value) => print('Token: $value'));
+    final token = await _firebaseMessaging.getToken();
+    print('Token: $token');
   }
 
   @override
@@ -139,9 +110,7 @@ class _Application extends State<Application> {
     super.initState();
     getToken();
 
-    FirebaseMessaging.instance
-        .getInitialMessage()
-        .then((RemoteMessage? message) {
+    FirebaseMessaging.instance.getInitialMessage().then((RemoteMessage? message) {
       if (message != null) {
         Navigator.pushNamed(
           context,
@@ -150,7 +119,6 @@ class _Application extends State<Application> {
         );
       }
     });
-
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       RemoteNotification? notification = message.notification;
       AndroidNotification? android = message.notification?.android;
@@ -163,10 +131,6 @@ class _Application extends State<Application> {
             android: AndroidNotificationDetails(
               channel.id,
               channel.name,
-              // channel.description,
-
-              // TODO add a proper drawable resource to android, for now using
-              //      one that already exists in example app.
               icon: 'launch_background',
             ),
           ),
@@ -183,6 +147,7 @@ class _Application extends State<Application> {
       );
     });
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -192,9 +157,9 @@ class _Application extends State<Application> {
           IconButton(onPressed: () {}, icon: const Icon(Icons.notifications_none))
         ],
       ),
-      body: SingleChildScrollView(
+      body: const SingleChildScrollView(
         child: Column(
-          children: const [
+          children: [
             Padding(
               padding: EdgeInsets.all(16),
               child: Center(
@@ -211,15 +176,15 @@ class _Application extends State<Application> {
     );
   }
 
-  _initializeFirebase() async {
-    await Firebase.initializeApp(
-        options: DefaultFirebaseOptions.currentPlatform);
+  Future<void> _initializeFirebase() async {
+    await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
     var result = await FlutterNotificationChannel().registerNotificationChannel(
-        description: 'For Showing Message Notification',
-        id: 'chats',
-        importance: NotificationImportance.IMPORTANCE_HIGH,
-        name: 'Chats');
+      description: 'For Showing Message Notification',
+      id: 'chats',
+      importance: NotificationImportance.IMPORTANCE_HIGH,
+      name: 'Chats',
+    );
 
     log('\nNotification Channel Result: $result');
   }
