@@ -11,14 +11,11 @@ class TTermsAndConditionCheckbox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.find<SignupController>();
-    final isDark = HelperFunctions.isDarkMode(context);
+    final controller = SignupController.instance;
+    final dark  = HelperFunctions.isDarkMode(context);
     return Row(
       children: [
-        SizedBox(
-          width: 24,
-          height: 24,
-          child: Obx(
+        SizedBox (  width: 24, height: 24, child: Obx(
                 () => Checkbox(
               value: controller.privacyPolicy.value,
               onChanged: (value) => controller.privacyPolicy.value = !controller.privacyPolicy.value,
@@ -29,17 +26,19 @@ class TTermsAndConditionCheckbox extends StatelessWidget {
         Text.rich(
           TextSpan(
             children: [
-              TextSpan(text: '${Texts.iAgreeTo} ', style: Theme.of(context).textTheme.labelMedium),
-              TextSpan(text: '${Texts.privacyPolicy} ', style: Theme.of(context).textTheme.labelLarge!.apply(
-                color: isDark ? TColors.white : TColors.primary,
+              TextSpan(text: '${Texts.iAgreeTo} ', style: Theme.of(context).textTheme.bodySmall),
+              TextSpan(
+                text: '${Texts.privacyPolicy} ',
+                 style: Theme.of(context).textTheme.bodyMedium!.apply(
+                color: dark ? TColors.white : TColors.primary,
                 decoration: TextDecoration.underline,
-                decorationColor: isDark ? TColors.white : TColors.primary,
+                decorationColor: dark ? TColors.white : TColors.primary,
               )),
               TextSpan(text: '${Texts.and} ', style: Theme.of(context).textTheme.labelMedium),
               TextSpan(text: '${Texts.termsOfUse} ', style: Theme.of(context).textTheme.labelLarge!.apply(
-                color: isDark ? TColors.white : TColors.primary,
+                color: dark ? TColors.white : TColors.primary,
                 decoration: TextDecoration.underline,
-                decorationColor: isDark ? TColors.white : TColors.primary,
+                decorationColor: dark ? TColors.white : TColors.primary,
               )),
             ],
           ),
