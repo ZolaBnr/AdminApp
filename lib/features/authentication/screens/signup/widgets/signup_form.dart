@@ -19,34 +19,24 @@ class TSignupForm extends StatelessWidget {
       key: controller.signupFormKey,
       child: Column(
         children: [
-
           ///First & Last Name
           Row(
             children: [
               Expanded(
                 child: TextFormField(
                   controller: controller.firstName,
-                  validator: (value) =>
-                      Validator.validateEmptyText('firstName', value),
+                  validator: (value) => Validator.validateEmptyText('firstName', value),
                   expands: false,
-                  decoration: const InputDecoration(
-                    labelText: Texts.firstName,
-                    prefixIcon: Icon(Iconsax.user),
-                  ),
+                  decoration: const InputDecoration( labelText: Texts.firstName, prefixIcon: Icon(Iconsax.user)),
                 ),
               ),
-
               const SizedBox(width: Sizes.spaceBtwinputField),
               Expanded(
                 child: TextFormField(
                   controller: controller.lastName,
-                  validator: (value) =>
-                      Validator.validateEmptyText('lastName', value),
+                  validator: (value) => Validator.validateEmptyText('lastName', value),
                   expands: false,
-                  decoration: const InputDecoration(
-                    labelText: Texts.lastName,
-                    prefixIcon: Icon(Iconsax.user),
-                  ),
+                  decoration: const InputDecoration(labelText: Texts.lastName,prefixIcon: Icon(Iconsax.user) ),
                 ),
               ),
             ],
@@ -56,13 +46,9 @@ class TSignupForm extends StatelessWidget {
           /// Username
           TextFormField(
             controller: controller.username,
-            validator: (value) =>
-                Validator.validateEmptyText('username', value),
+            validator: (value) => Validator.validateEmptyText('username', value),
             expands: false,
-            decoration: const InputDecoration(
-              labelText: Texts.username,
-              prefixIcon: Icon(Iconsax.user_edit),
-            ),
+            decoration: const InputDecoration( labelText: Texts.username,prefixIcon: Icon(Iconsax.user_edit) ),
           ),
           const SizedBox(height: Sizes.spaceBtwinputField),
 
@@ -70,10 +56,7 @@ class TSignupForm extends StatelessWidget {
           TextFormField(
             controller: controller.email,
             validator: (value) => Validator.validateEmail(value),
-            decoration: const InputDecoration(
-              labelText: Texts.email,
-              prefixIcon: Icon(Iconsax.direct),
-            ),
+            decoration: const InputDecoration( labelText: Texts.email,prefixIcon: Icon(Iconsax.direct)),
           ),
           const SizedBox(height: Sizes.spaceBtwinputField),
 
@@ -81,17 +64,13 @@ class TSignupForm extends StatelessWidget {
           TextFormField(
             controller: controller.phoneNumber,
             validator: (value) => Validator.validatePhoneNumber(value),
-            decoration: const InputDecoration(
-              labelText: Texts.phoneNo,
-              prefixIcon: Icon(Iconsax.call),
-            ),
+            decoration: const InputDecoration( labelText: Texts.phoneNo,prefixIcon: Icon(Iconsax.call) ),
           ),
           const SizedBox(height: Sizes.spaceBtwinputField),
 
           /// Password
           Obx(
-                () =>
-                TextFormField(
+                () => TextFormField(
                   validator: (value) => Validator.validatePassword(value),
                   controller: controller.password,
                   obscureText: controller.hidePassword.value,
@@ -115,7 +94,7 @@ class TSignupForm extends StatelessWidget {
           const TTermsAndConditionCheckbox(),
           const SizedBox(height: Sizes.spaceBtwSections),
 
-          /// Sign Up Button
+         /// Sign Up Button
           SizedBox(
               width: double.infinity,
               child: ElevatedButton(
