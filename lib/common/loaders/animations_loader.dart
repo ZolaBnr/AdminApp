@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
+import 'package:untitled3/utils/constants/colors.dart';
 import '../../../utils/constants/sizes.dart';
+
 
 ///Awidget for displaying an animated indicotor with optional text and action button
 class TAnimationLoaderWidget extends StatelessWidget {
   ///Default constructor for the TAnimationLoaderWidget
   ///
-  /// Parameters
+  /// Parameters:
   /// -Text: the text to be displayrd the animation
   /// -animation: the path to the lottie animation file
   /// -showAction :whether to show an action button below the text
@@ -15,7 +17,7 @@ class TAnimationLoaderWidget extends StatelessWidget {
   final String text;
   final String animation;
   final bool showAction;
-  final String actionText;
+  final String? actionText;
   final VoidCallback? onActionPressed;
 
   const TAnimationLoaderWidget({
@@ -23,7 +25,7 @@ class TAnimationLoaderWidget extends StatelessWidget {
     required this.text,
     required this.animation,
     this.showAction = false,
-    required this.actionText,
+    this.actionText,
     this.onActionPressed,
   });
 
@@ -35,8 +37,7 @@ class TAnimationLoaderWidget extends StatelessWidget {
         children: [
           Lottie.asset(
             animation,
-            width: MediaQuery.of(context).size.width * 0.8,
-          ), //Display Lottie animation
+            width: MediaQuery.of(context).size.width * 0.8, ), //Display Lottie animation
           const SizedBox(height: Sizes.defaultSpace),
           Text(
             text,
@@ -46,20 +47,23 @@ class TAnimationLoaderWidget extends StatelessWidget {
           const SizedBox(height: Sizes.defaultSpace),
           showAction
               ? SizedBox(
-            width: 250,
-            child: OutlinedButton(
-              onPressed: onActionPressed,
-              style: OutlinedButton.styleFrom(backgroundColor: Colors.black),
-              child: Text(
-                actionText,
-                style: Theme.of(context).textTheme.bodyMedium?.apply(color: Colors.white),
-              ),
-            ),
-          )
-              :const SizedBox(),
+                  width: 250,
+                  child: OutlinedButton(
+                    onPressed: onActionPressed,
+                    style:
+                        OutlinedButton.styleFrom(backgroundColor: TColors.dark),
+                    child: Text(
+                       actionText!,
+                       style: Theme.of(context)
+                          .textTheme
+                          .bodyMedium
+                          !.apply(color: TColors.light),
+                    ),
+                  ),
+                )
+              : const SizedBox(),
         ],
       ),
     );
-
   }
 }
