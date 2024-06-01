@@ -5,49 +5,46 @@ import 'package:get/get.dart';
 
 import '../popups/loaders.dart';
 
-
-
 class NetworkManager extends GetxController {
   static NetworkManager get instance => Get.find();
 
   final Connectivity _connectivity = Connectivity();
-  late StreamSubscription<List<ConnectivityResult>> _connectivitySubscription;
+  late StreamSubscription<ConnectivityResult> _connectivitySubscription;
   final Rx<ConnectivityResult> _connectionStatus = ConnectivityResult.none.obs;
 
   @override
   void onInit() {
     super.onInit();
-    _connectivitySubscription =
-        _connectivity.onConnectivityChanged.listen(_updateConnectionStatus); //_updatersGroupIds
+    _connectivitySubscription = _connectivity.onConnectivityChanged.listen(_updateConnectionStatus as void Function(List<ConnectivityResult> event)? ) as StreamSubscription<ConnectivityResult>;
+       
   }
-  ///Update the connection status based on changes is connectivity and show a relevant popup for no internet connection
-  Future<void> _updateConnectionStatus(List<ConnectivityResult> result) async {
-    if (result.isNotEmpty) {
-      _connectionStatus.value = result.first;
-      if (result.first == ConnectivityResult.none) {
+    ///Update the connection status based on changes is connectivity and show a relevant popup for no internet connection
+    Future<void> _updateConnectionStatus(ConnectivityResult result) async {
+      _connectionStatus.value = result;
+      if (_connectionStatus.value == ConnectivityResult.none) {
         TLoaders.warningSnackBar(title: 'No Internet Connection');
       }
     }
-  }
 
-  /// Check the internet connection status
-  /// Returns 'true' if connected, 'false' otherwise
-  Future<bool> isConnected() async {
-    try {
-      if (_connectionStatus.value == ConnectivityResult.none) {
+    /// Check the internet connection status
+    /// Returns 'true' if connected, 'false' otherwise
+    Future<bool> isConnected() async {
+      try {
+        final result = await _connectivity.checkConnectivity();
+        if (result == ConnectivityResult.none) {
+          return false;
+        } else {
+          return true;
+        }
+      } on PlatformException {
         return false;
-      } else {
-        return true;
       }
-    } on PlatformException {
-      return false;
+    }
+
+    /// Dispose or close the active connectivity stream
+    @override
+    void onClose() {
+      super.onClose();
+      _connectivitySubscription.cancel();
     }
   }
-
-  /// Dispose or close the active connectivity stream
-  @override
-  void onClose() {
-    super.onClose();
-    _connectivitySubscription.cancel();
-  }
-}
